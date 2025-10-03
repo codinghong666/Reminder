@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>QQ 数据列表</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}" />
+</head>
+<body>
+  <header class="header">
+    <h1>QQ 数据列表</h1>
+    <button id="refreshBtn" class="btn" type="button">刷新</button>
+  </header>
+
+  <main>
+    <section class="form">
+      <input id="timeInput" placeholder="time:10:03:00:00" />
+      <input id="msgInput" placeholder="content" />
+      <button id="addBtn" class="btn" type="button">添加</button>
+    </section>
+    <ul id="list" class="list"></ul>
+    <template id="itemTpl">
+      <li class="item">
+        <div class="info">
+          <div class="time"></div>
+          <div class="content"></div>
+        </div>
+        <button class="btn btn-danger delete" type="button">删除</button>
+      </li>
+    </template>
+  </main>
+
+  <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+</html>
+

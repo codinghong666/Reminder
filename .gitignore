@@ -1,0 +1,84 @@
+# ---- Python 通用 ----
+__pycache__/
+*.py[cod]
+*$py.class
+
+# C 扩展
+*.so
+
+# 包/分发
+build/
+dist/
+downloads/
+eggs/
+.eggs/
+*.egg-info/
+*.egg
+MANIFEST
+
+# 单元测试/覆盖率
+htmlcov/
+.tox/
+.nox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis/
+.pytest_cache/
+
+# 文档
+docs/_build/
+
+# Jupyter / IPython
+.ipynb_checkpoints
+profile_default/
+ipython_config.py
+
+# 类型检查
+.mypy_cache/
+.pytype/
+.pyre/
+
+# Cython 调试符号
+cython_debug/
+
+# 虚拟环境
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# 编辑器/IDE
+.vscode/
+.idea/
+
+# ---- 项目特定 (QQBot/Reminder) ----
+# main 模块输出与日志
+src/main/output/
+src/main/*.log
+src/main/minimal_scheduler.log
+src/main/send.log
+
+# 本地数据库与配置
+src/main/qq.db
+src/main/config.env
+
+# 运行时生成文件
+src/main/__pycache__/
+
+# SDU_DeepSeek 私有数据（子目录已含 .gitignore，这里再兜底一次）
+src/SDU_DeepSeek/cookies.json
+src/SDU_DeepSeek/fingerprint.txt
+
+# 系统与杂项
+*.DS_Store
+Thumbs.db
+
+

@@ -1,0 +1,28 @@
+[Unit]
+Description=QQ Bot Scheduler Service
+After=network.target
+Wants=network.target
+
+[Service]
+Type=simple
+User=coding_hong
+Group=coding_hong
+WorkingDirectory=/home/coding_hong/Documents/QQBot/main
+ExecStart=/home/coding_hong/miniconda3/envs/RL/bin/python /home/coding_hong/Documents/QQBot/main/main.py
+Restart=always
+RestartSec=10
+StandardOutput=journal
+StandardError=journal
+
+# 环境变量
+Environment=PYTHONPATH=/home/coding_hong/Documents/QQBot/main
+Environment=PYTHONUNBUFFERED=1
+
+# 安全设置
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ReadWritePaths=/home/coding_hong/Documents/QQBot/main
+
+[Install]
+WantedBy=multi-user.target
