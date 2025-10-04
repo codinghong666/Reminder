@@ -69,6 +69,15 @@ def iter_data():
     conn.close()
     return result
 
+def get_hand_add_data():
+    conn = sqlite3.connect(DB_PATH)
+    cursor = conn.cursor()
+    cursor.execute('''
+        SELECT * FROM qq WHERE group_id = 1
+    ''')
+    result = cursor.fetchall()
+    conn.close()
+    return result
 
 def get_next_message_id_for_group_1() -> str:
     """Return next message_id (as string) for group_id='1'. Start from '1' if none."""

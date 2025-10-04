@@ -2,6 +2,7 @@ import requests
 import os
 from simple_qq_parser import get_group_messages, parse_text_only
 from loadconfig import load_config
+from datebase import get_hand_add_data
 def get_summary():
     # 获取当前文件所在目录
     current_dir = os.path.dirname(os.path.abspath(__file__))
@@ -27,6 +28,10 @@ def get_summary():
         else:
             print(f"Warning: Failed to get messages for group {group_id}")
             continue
+    hand_add_data = get_hand_add_data()
+    for data in hand_add_data:
+        date_all += f'\n{cnt+1}. [{data[2]}] {data[3]}'
+        cnt += 1
     current_dir = os.path.dirname(os.path.abspath(__file__))
     prompt_path = os.path.join(current_dir, "prompt_for_summary.txt")
     prompt = open(prompt_path, "r").read()
@@ -61,9 +66,11 @@ def get_summary():
     # 检查是否包含时间信息
     content = content.strip()
     print(f"Final content: {content}")
-    with open("summary.txt", "w") as f:
+
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+    summary_path = os.path.join(current_dir, "summary.txt")
+    with open(summary_path, "w") as f:
         f.write(content)
 
-    
 if __name__ == "__main__":
     get_summary()
