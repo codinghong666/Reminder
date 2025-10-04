@@ -48,22 +48,8 @@ QQBot/Reminder/
 ### 1. 环境准备
 
 #### 系统要求
-- Python 3.8+
-- Conda环境管理器
 - 至少4GB内存（本地LLM模式需要8GB显存）
 - 400MB内存（API模式）
-
-#### 创建Conda环境
-```bash
-# 创建环境
-conda create -n qqbot python=3.9
-
-# 激活环境
-conda activate qqbot
-
-# 安装依赖
-pip install -r src/requirements.txt
-```
 
 ### 2. NapCat配置
 
