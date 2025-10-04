@@ -23,3 +23,108 @@ html,body{margin:0;padding:0;background:var(--bg);color:var(--fg);font-family:sy
 .form{max-width:980px;margin:0 auto 12px;padding:0 12px;display:flex;gap:8px}
 .form input{flex:1 1 40%;padding:6px 8px;border:1px solid var(--border);border-radius:6px}
 
+/* Summary section styles */
+.summary-section{max-width:980px;margin:0 auto 20px;padding:0 12px}
+.summary-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.summary-header h2{margin:0;font-size:18px;color:var(--fg)}
+.summary-content{background:#f8f9fa;border:1px solid var(--border);border-radius:8px;padding:16px;min-height:60px}
+.summary-content .loading{color:var(--muted);font-style:italic;text-align:center;padding:20px}
+.summary-content .error{color:var(--danger);text-align:center;padding:20px}
+.summary-content .summary-text{white-space:pre-wrap;word-break:break-word;line-height:1.5}
+
+/* LaTeX/MathJax styles */
+.summary-content .summary-text .MathJax{font-size:1.1em}
+.summary-content .summary-text mjx-container{display:inline-block;margin:0 2px}
+.summary-content .summary-text mjx-container[display="true"]{display:block;margin:8px 0;text-align:center}
+
+/* Markdown styles */
+.summary-content .summary-text h1,
+.summary-content .summary-text h2,
+.summary-content .summary-text h3,
+.summary-content .summary-text h4,
+.summary-content .summary-text h5,
+.summary-content .summary-text h6 {
+  margin: 8px 0 4px 0;
+  font-weight: bold;
+  color: var(--fg);
+}
+
+.summary-content .summary-text h1 { font-size: 1.5em; }
+.summary-content .summary-text h2 { font-size: 1.3em; }
+.summary-content .summary-text h3 { font-size: 1.2em; }
+.summary-content .summary-text h4 { font-size: 1.1em; }
+.summary-content .summary-text h5 { font-size: 1.05em; }
+.summary-content .summary-text h6 { font-size: 1em; }
+
+.summary-content .summary-text p {
+  margin: 4px 0;
+  line-height: 1.4;
+}
+
+.summary-content .summary-text strong,
+.summary-content .summary-text b {
+  font-weight: bold;
+  color: var(--fg);
+}
+
+.summary-content .summary-text em,
+.summary-content .summary-text i {
+  font-style: italic;
+}
+
+.summary-content .summary-text code {
+  background: #f1f1f1;
+  padding: 2px 4px;
+  border-radius: 3px;
+  font-family: 'Courier New', monospace;
+  font-size: 0.9em;
+}
+
+.summary-content .summary-text pre {
+  background: #f8f8f8;
+  padding: 8px;
+  border-radius: 6px;
+  overflow-x: auto;
+  margin: 4px 0;
+  border-left: 4px solid var(--border);
+}
+
+.summary-content .summary-text pre code {
+  background: none;
+  padding: 0;
+}
+
+.summary-content .summary-text ul,
+.summary-content .summary-text ol {
+  margin: 4px 0;
+  padding-left: 20px;
+}
+
+.summary-content .summary-text li {
+  margin: 2px 0;
+  line-height: 1.3;
+}
+
+.summary-content .summary-text blockquote {
+  border-left: 4px solid var(--muted);
+  margin: 4px 0;
+  padding-left: 16px;
+  color: var(--muted);
+  font-style: italic;
+}
+
+.summary-content .summary-text a {
+  color: #0066cc;
+  text-decoration: none;
+}
+
+.summary-content .summary-text a:hover {
+  text-decoration: underline;
+}
+
+.summary-content .summary-text hr {
+  border: none;
+  border-top: 1px solid var(--border);
+  margin: 8px 0;
+}
+

@@ -69,6 +69,7 @@ src/main/send.log
 # 本地数据库与配置
 src/main/qq.db
 src/main/config.env
+src/main/summary.txt
 
 # 运行时生成文件
 src/main/__pycache__/

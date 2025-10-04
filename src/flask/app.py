@@ -1,7 +1,7 @@
 from flask import Flask, request, jsonify, make_response, render_template
 import os
 import sys
-
+import time
 # 保证可以复用 src/main/datebase.py
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 MAIN_DIR = os.path.join(BASE_DIR, 'main')
@@ -10,7 +10,7 @@ if MAIN_DIR not in sys.path:
 
 from datebase import iter_data, remove_data, init_database, insert_data  # noqa: E402
 from datebase import get_next_message_id_for_group_1  # noqa: E402
-
+from summary import get_summary  # noqa: E402
 
 app = Flask(__name__)
 @app.route('/')
@@ -82,8 +82,33 @@ def api_create_message():
     return jsonify({'ok': True, 'group_id': group_id, 'message_id': message_id})
 
 
+@app.route('/api/summary', methods=['GET', 'OPTIONS'])
+def api_get_summary():
+    if request.method == 'OPTIONS':
+        return make_response('', 204)
+    with open(os.path.join(MAIN_DIR, "summary.txt"), "r") as f:
+        summary = f.read()
+    if summary:
+        return jsonify({'ok': True, 'summary': summary})
+    get_summary()
+    time.sleep(2)
+    # 使用正确的路径读取summary.txt
+    summary_path = os.path.join(MAIN_DIR, "summary.txt")
+    with open(summary_path, "r") as f:
+        summary = f.read()
+    return jsonify({'ok': True, 'summary': summary})
+
+@app.route('/api/refresh_summary', methods=['GET', 'OPTIONS'])
+def refresh_summary():
+    if request.method == 'OPTIONS':
+        return make_response('', 204)
+    get_summary()
+    time.sleep(2)
+    # 使用正确的路径读取summary.txt
+    summary_path = os.path.join(MAIN_DIR, "summary.txt")
+    with open(summary_path, "r") as f:
+        summary = f.read()
+    return jsonify({'ok': True, 'summary': summary})
 if __name__ == "__main__":
     # 绑定 0.0.0.0 方便外部访问，如需可改端口
     app.run(host="0.0.0.0", port=5000, debug=False)
-
-

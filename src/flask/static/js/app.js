@@ -7,6 +7,25 @@ const $refresh = document.getElementById('refreshBtn');
 const $add = document.getElementById('addBtn');
 const $time = document.getElementById('timeInput');
 const $msg = document.getElementById('msgInput');
+const $summaryContent = document.getElementById('summaryContent');
+const $refreshSummary = document.getElementById('refreshSummaryBtn');
+
+// 配置marked.js
+marked.setOptions({
+  breaks: true,
+  gfm: true
+});
+
+// 渲染Markdown和LaTeX的函数
+function renderMarkdownAndLatex(content) {
+  // 先渲染Markdown
+  const htmlContent = marked.parse(content);
+  // 然后触发MathJax渲染LaTeX
+  if (window.MathJax) {
+    MathJax.typesetPromise([$summaryContent]);
+  }
+  return htmlContent;
+}
 
 async function fetchJSON(url, options){
   const res = await fetch(url, options);
@@ -40,6 +59,36 @@ function render(items){
   }
 }
 
+async function loadSummary(){
+  try{
+    $summaryContent.innerHTML = '<div class="loading">正在加载摘要...</div>';
+    const data = await fetchJSON(`${API_BASE}/api/summary`);
+    if(data.ok && data.summary){
+      const htmlContent = renderMarkdownAndLatex(data.summary);
+      $summaryContent.innerHTML = `<div class="summary-text">${htmlContent}</div>`;
+    } else {
+      $summaryContent.innerHTML = '<div class="error">获取摘要失败</div>';
+    }
+  }catch(err){
+    $summaryContent.innerHTML = `<div class="error">加载摘要失败：${err.message}</div>`;
+  }
+}
+
+async function refreshSummary(){
+  try{
+    $summaryContent.innerHTML = '<div class="loading">正在生成摘要...</div>';
+    const data = await fetchJSON(`${API_BASE}/api/refresh_summary`);
+    if(data.ok && data.summary){
+      const htmlContent = renderMarkdownAndLatex(data.summary);
+      $summaryContent.innerHTML = `<div class="summary-text">${htmlContent}</div>`;
+    } else {
+      $summaryContent.innerHTML = '<div class="error">获取摘要失败</div>';
+    }
+  }catch(err){
+    $summaryContent.innerHTML = `<div class="error">加载摘要失败：${err.message}</div>`;
+  }
+}
+
 async function load(){
   try{
     const data = await fetchJSON(`${API_BASE}/api/messages`);
@@ -50,8 +99,12 @@ async function load(){
 }
 
 $refresh.addEventListener('click', load);
+$refreshSummary.addEventListener('click', refreshSummary);
 
-document.addEventListener('DOMContentLoaded', load);
+document.addEventListener('DOMContentLoaded', () => {
+  load();
+  loadSummary();
+});
 
 $add.addEventListener('click', async () => {
   const time = ($time.value || '').trim();
@@ -68,6 +121,7 @@ $add.addEventListener('click', async () => {
     });
     $msg.value = '';
     await load();
+    await refreshSummary();
   }catch(err){
     alert('添加失败：'+err.message);
   }

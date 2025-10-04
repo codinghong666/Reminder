@@ -17,6 +17,7 @@ def load_config(config_file="config.env"):
     token = os.getenv('TOKEN')
     group_ids_str = os.getenv('GROUP_IDS')
     message_count = int(os.getenv('MESSAGE_COUNT', '20'))
+    summary_count = int(os.getenv('SUMMARY_COUNT', '10'))
     work_time = os.getenv('WORK_TIME', '02:00')
     send_time = os.getenv('SEND_TIME', '08:50')
     base_url = os.getenv('BASE_URL', 'http://localhost:3001')
@@ -53,7 +54,8 @@ def load_config(config_file="config.env"):
         "work_time": work_time,
         "send_time": send_time,
         "model": model,
-        "working_qq": working_qq
+        "working_qq": working_qq,
+        "summary_count": summary_count
     }
     
     return config

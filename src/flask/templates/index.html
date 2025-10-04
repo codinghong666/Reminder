@@ -5,6 +5,23 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>QQ 数据列表</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}" />
+  <!-- MathJax for LaTeX support -->
+  <script>
+    MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']],
+        displayMath: [['$$', '$$'], ['\\[', '\\]']],
+        processEscapes: true,
+        processEnvironments: true
+      },
+      options: {
+        skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre']
+      }
+    };
+  </script>
+  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+  <!-- Marked.js for Markdown support -->
+  <script src="https://cdn.jsdelivr.net/npm/marked@9.1.6/marked.min.js"></script>
 </head>
 <body>
   <header class="header">
@@ -18,6 +35,17 @@
       <input id="msgInput" placeholder="content" />
       <button id="addBtn" class="btn" type="button">添加</button>
     </section>
+    
+    <section class="summary-section">
+      <div class="summary-header">
+        <h2>任务摘要</h2>
+        <button id="refreshSummaryBtn" class="btn" type="button">刷新摘要</button>
+      </div>
+      <div id="summaryContent" class="summary-content">
+        <div class="loading">正在加载摘要...</div>
+      </div>
+    </section>
+    
     <ul id="list" class="list"></ul>
     <template id="itemTpl">
       <li class="item">
