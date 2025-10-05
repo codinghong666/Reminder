@@ -36,7 +36,6 @@ def work():
                 # Binary search for first non-existent message
                 l, r = 0, message_count - 1
                 ans = message_count  # Default to start from the end, skip if all exist
-                
                 while l <= r:
                     mid = (l + r) // 2
                     if check(group_id, group_data['message_ids'][mid]):
@@ -54,13 +53,12 @@ def work():
                     try:
                         # time_info = extract_time_info(message)
                         time_info = extract_time_info_by_api(message)
-                        if time_info is not None:
-                            result_line = f"{time_info}:\n{message}"
-                            print(result_line)
-                            f.write(f"{result_line}\n")
-                            insert_data(group_id, message_id, message, time_info)
-                        else:
-                            print("No time information detected")
+                        if time_info is None:
+                            time_info = "None"
+                        result_line = f"{time_info}:\n{message}"
+                        print(result_line)
+                        f.write(f"{result_line}\n")
+                        insert_data(group_id, message_id, message, time_info)
                     except Exception as e:
                         error_msg = f"Time extraction failed: {e}"
                         print(error_msg)

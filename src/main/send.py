@@ -84,7 +84,7 @@ def check_all():
             
             for record in data:
                 message_time_str = record[4]  # Time field
-                if message_time_str:
+                if message_time_str != "None":
                     message_time_str = message_time_str.strip()
                     try:
                         # Parse time string (format: MM:DD:HH:MM)

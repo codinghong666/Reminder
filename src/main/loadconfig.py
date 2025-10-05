@@ -21,6 +21,7 @@ def load_config(config_file="config.env"):
     work_time = os.getenv('WORK_TIME', '02:00')
     send_time = os.getenv('SEND_TIME', '08:50')
     base_url = os.getenv('BASE_URL', 'http://localhost:3001')
+    api_key = os.getenv('API_KEY')
     
     # Validate required fields
     if not token:
@@ -43,6 +44,7 @@ def load_config(config_file="config.env"):
     send_id = os.getenv('SEND_ID')
     model = os.getenv('MODEL')
     working_qq = os.getenv('WORKING_QQ')
+    model_choice = os.getenv('MODEL_CHOICE')
     config = {
         "api": {
             "base_url": base_url,
@@ -55,7 +57,9 @@ def load_config(config_file="config.env"):
         "send_time": send_time,
         "model": model,
         "working_qq": working_qq,
-        "summary_count": summary_count
+        "summary_count": summary_count,
+        "api_key": api_key,
+        "model_choice": model_choice
     }
     
     return config
