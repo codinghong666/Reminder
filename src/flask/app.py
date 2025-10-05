@@ -111,4 +111,4 @@ def refresh_summary():
     return jsonify({'ok': True, 'summary': summary})
 if __name__ == "__main__":
     # 绑定 0.0.0.0 方便外部访问，如需可改端口
-    app.run(host="0.0.0.0", port=5000, debug=False)
+    app.run(host="0.0.0.0", port=5678, debug=False)

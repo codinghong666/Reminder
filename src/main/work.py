@@ -1,8 +1,24 @@
 from simple_qq_parser import get_and_parse_messages
-from llm import extract_time_info, unload_model, extract_time_info_by_api
 from datetime import datetime
 import os
 from datebase import find_if_exist, insert_data, remove_data, iter_data, init_database
+import util
+from loadconfig import load_config
+import my_llm
+def extract_time_info(message:str)->str:
+    model = util.get_llm(load_config().get('model_choice'))
+    print(f"model: {model}")
+    prompt = open("prompt.txt", "r").read() 
+    print(f"prompt: {prompt}")
+    
+    # Build complete prompt
+    full_prompt = prompt + "\n" + message
+    output = model(full_prompt)
+    output = output.strip()
+    if not output or output.lower() in ['无', '没有', 'none', 'no', '无时间信息', '未检测到时间信息', 'no time information detected']:
+        return None
+    return output
+
 def check(group_id, message_id):
     return not find_if_exist(group_id, message_id)
 
@@ -52,7 +68,7 @@ def work():
                     print(message)
                     try:
                         # time_info = extract_time_info(message)
-                        time_info = extract_time_info_by_api(message)
+                        time_info = extract_time_info(message)
                         if time_info is None:
                             time_info = "None"
                         result_line = f"{time_info}:\n{message}"
@@ -69,9 +85,7 @@ def work():
     else:
         print("No groups processed")
     
-    # Release model, free GPU memory
-    print("Releasing model from GPU...")
-    unload_model()
+
 def see_data():
     data = iter_data()
     for i in data:

@@ -127,7 +127,7 @@ def use_sdu_model(prompt:str)->str:
     response = requests.post(
         "http://localhost:8000/v1/chat/completions",
         json=api_data,
-        timeout=30
+        timeout=120
     )
     
     if response.status_code != 200:
@@ -168,21 +168,9 @@ def use_api_model(prompt:str)->str:
     print(f"api_model content: {output}")
     return output
 
-def extract_time_info(message:str)->str:
-    model = util.get_llm(load_config().get('model_choice'))
-    print(f"model: {model}")
-    prompt = open("prompt.txt", "r").read() 
-    print(f"prompt: {prompt}")
-    
-    # Build complete prompt
-    full_prompt = prompt + "\n" + message
-    output = model(full_prompt)
-    output = output.strip()
-    if not output or output.lower() in ['无', '没有', 'none', 'no', '无时间信息', '未检测到时间信息', 'no time information detected']:
-        return None
-    return output
 
-if __name__ == "__main__":
-    message1 = "各位同学大家好，现转发一则体育学院通知：山东大学第二十一届体育文化节之山大杯学生跳绳比赛竞赛规程-山东大学体育学院  https://www.tyb.sdu.edu.cn/info/1090/6466.htm对此活动有兴趣的同学请联系体委组 24 化学 姜宝骏同学，联系方式qq:2161044291"
-    message2 = "各位同学：奖学金申请系统现已开启，请【奖学金公示名单】中的同学，于10月3日（周五）14:00前登录山东大学学生管理系统（http://211.86.56.236/login.do）进行申报，申报流程请参考附件1。注：请【威海校区学籍同学】暂时不要进行系统申请，待后续通知。@全体成员"
-    print(extract_time_info(message1))
+
+# if __name__ == "__main__":
+#     message1 = "各位同学大家好，现转发一则体育学院通知：山东大学第二十一届体育文化节之山大杯学生跳绳比赛竞赛规程-山东大学体育学院  https://www.tyb.sdu.edu.cn/info/1090/6466.htm对此活动有兴趣的同学请联系体委组 24 化学 姜宝骏同学，联系方式qq:2161044291"
+#     message2 = "各位同学：奖学金申请系统现已开启，请【奖学金公示名单】中的同学，于10月3日（周五）14:00前登录山东大学学生管理系统（http://211.86.56.236/login.do）进行申报，申报流程请参考附件1。注：请【威海校区学籍同学】暂时不要进行系统申请，待后续通知。@全体成员"
+#     print(extract_time_info(message1))

@@ -103,7 +103,7 @@ def remove_all_data():
     conn.commit()
     conn.close()
 if __name__ == "__main__":
-    remove_all_data()
+    # remove_all_data()
     # remove_data('1062848088', '889743639')
     for i in iter_data():
         print(i)

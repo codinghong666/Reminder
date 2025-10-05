@@ -3,6 +3,9 @@ import os
 from simple_qq_parser import get_group_messages, parse_text_only
 from loadconfig import load_config
 from datebase import get_hand_add_data
+import util
+import my_llm  # 导入my_llm模块以注册LLM
+
 def get_summary():
     # 获取当前文件所在目录
     current_dir = os.path.dirname(os.path.abspath(__file__))
@@ -37,34 +40,10 @@ def get_summary():
     prompt = open(prompt_path, "r").read()
     prompt = prompt + "\n" + date_all
     print(prompt)
+    print(f"model_choice: {load_config().get('model_choice')}")
+    model = util.get_llm(load_config().get('model_choice'))
+    content = model(prompt)
 
-    api_data = {
-        "model": "deepseek_reasoner_web",
-        "messages": [
-            {"role": "user", "content": prompt}
-        ],
-        "stream": False
-    }
-    
-    # 调用API
-    response = requests.post(
-        "http://localhost:8000/v1/chat/completions",
-        json=api_data,
-        timeout=120
-    )
-    
-    if response.status_code != 200:
-        print(f"API调用失败，状态码: {response.status_code}")
-        return None
-    
-    result = response.json()
-    content = result['choices'][0]['message']['content'].strip()
-    
-    
-    if "<think>" in content:
-        content = content.split("<think>")[1].split("</think>")[1]
-    # 检查是否包含时间信息
-    content = content.strip()
     print(f"Final content: {content}")
 
     current_dir = os.path.dirname(os.path.abspath(__file__))
