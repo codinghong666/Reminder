@@ -1,6 +1,8 @@
 # QQ群聊DDL提醒器
 
 ## 项目简介
+有任何问题可以先查看
+[DeepWiki](https://deepwiki.com/codinghong666/Reminder)
 
 一个基于NapCat和本地LLM的QQ群聊DDL（截止日期）提醒系统，能够自动抓取群消息、提取DDL信息并定时推送提醒。支持使用SDU_DeepSeek API或本地LLM进行信息提取，并提供Web界面进行数据管理。
 
