@@ -3,8 +3,7 @@ import os
 os.environ["TRANSFORMERS_OFFLINE"] = "1"
 os.environ["HF_HUB_OFFLINE"] = "1"
 
-from transformers import AutoModelForCausalLM, AutoTokenizer, BitsAndBytesConfig
-import torch
+
 import requests
 import json
 import util
@@ -15,7 +14,8 @@ tokenizer = None
 
 @util.register_llm("local_model")
 def use_local_model(prompt:str)->str:   
-
+    from transformers import AutoModelForCausalLM, AutoTokenizer, BitsAndBytesConfig
+    import torch
     def load_model():
         """Load model and tokenizer to GPU, execute only once"""
         global model, tokenizer
