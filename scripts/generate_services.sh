@@ -9,7 +9,48 @@ REPO_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
 # Detect runtime context
 RUN_USER="${SUDO_USER:-$(whoami)}"
 RUN_GROUP="$(id -gn "$RUN_USER")"
-PYTHON_BIN="${PYTHON_BIN:-$(command -v python3)}"
+
+# Prefer the caller's conda/mamba/micromamba env python if available
+detect_user_python() {
+  # 1) Honor explicit override
+  if [[ -n "${PYTHON_BIN:-}" ]] && [[ -x "${PYTHON_BIN}" ]]; then
+    echo "$PYTHON_BIN"; return 0;
+  fi
+
+  # 2) Try user's active python (captures conda env if activated in their shell)
+  local p
+  p=$(sudo -u "$RUN_USER" -H bash -lc 'python -c "import sys;print(sys.executable)"' 2>/dev/null || true)
+  if [[ -n "$p" ]] && [[ -x "$p" ]]; then
+    echo "$p"; return 0;
+  fi
+
+  # 3) Try user's PATH python
+  p=$(sudo -u "$RUN_USER" -H bash -lc 'command -v python' 2>/dev/null || true)
+  if [[ -n "$p" ]] && [[ -x "$p" ]]; then
+    echo "$p"; return 0;
+  fi
+
+  p=$(sudo -u "$RUN_USER" -H bash -lc 'command -v python3' 2>/dev/null || true)
+  if [[ -n "$p" ]] && [[ -x "$p" ]]; then
+    echo "$p"; return 0;
+  fi
+
+  # 4) Fallback to system
+  if command -v python3 >/dev/null 2>&1; then
+    command -v python3; return 0;
+  fi
+  if command -v python >/dev/null 2>&1; then
+    command -v python; return 0;
+  fi
+
+  echo ""; return 1;
+}
+
+PYTHON_BIN="$(detect_user_python)"
+if [[ -z "$PYTHON_BIN" ]]; then
+  echo "Failed to detect a Python interpreter. Set PYTHON_BIN explicitly." >&2
+  exit 1
+fi
 
 # Service names
 QQBOT_SERVICE="qqbot.service"
