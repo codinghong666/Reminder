@@ -53,7 +53,7 @@ QQBot/Reminder/
 
 #### 系统要求
 - 至少4GB内存（本地LLM模式需要8GB显存）
-- 400MB内存（API模式）
+- 50MB内存（API模式）
 
 ### 2. NapCat配置
 
@@ -78,18 +78,7 @@ python main.py
 
 首次运行会要求输入学号和密码，登录成功后会自动保存登录状态。
 
-#### 配置systemd服务（可选，推荐用脚本自动生成路径）
-```bash
-# 授权脚本（首次）
-chmod +x scripts/generate_services.sh
 
-# 自动生成并安装 systemd 服务（根据当前仓库路径、用户和 Python 自动写入）
-sudo scripts/generate_services.sh
-
-# 可选：指定 Python 解释器与自动启动
-# 使用你自己的 Python 路径（如 /home/you/miniconda3/envs/qqbot/bin/python）
-PYTHON_BIN=/usr/bin/python3 AUTO_START=1 sudo -E scripts/generate_services.sh
-```
 
 ### 4. 主程序配置
 
@@ -125,25 +114,30 @@ API_KEY=sk-****-8888-6666-168-1314     # LLM/API密钥（示例占位）
 
 #### 使用脚本一键生成并安装 systemd 服务
 ```bash
+#### 配置systemd服务（可选，推荐用脚本自动生成路径）
+```bash
 # 授权脚本（首次）
 chmod +x scripts/generate_services.sh
 
-# 默认使用当前用户与系统 python3
-sudo scripts/generate_services.sh
+#查看当前python版本
+which python
 
-# 可选：自定义 Python 解释器并自动启动服务
+# 可选：指定 Python 解释器与自动启动
+# 使用你自己的 Python 路径（如 /home/you/miniconda3/envs/qqbot/bin/python）
 PYTHON_BIN=/usr/bin/python3 AUTO_START=1 sudo -E scripts/generate_services.sh
+```
 ```
 
 脚本会根据当前仓库路径自动生成并写入：
 - `qqbot.service`（工作目录：`src/main`，启动 `main.py`）
 - `sduapi.service`（工作目录：`src/SDU_DeepSeek`，启动 `main.py`）
 
-生成后如需手动操作：
+常用操作：
 ```bash
 sudo systemctl daemon-reload
 sudo systemctl enable qqbot.service && sudo systemctl restart qqbot.service
 sudo systemctl enable sduapi.service && sudo systemctl restart sduapi.service
+watch -n 1 sudo systemctl status qqbot.service
 ```
 
 ### 6. Flask Web界面
@@ -154,7 +148,7 @@ cd src/flask
 python app.py
 ```
 
-Web界面将在 `http://localhost:5000` 启动。
+Web界面将在 `http://localhost:5678` 启动。
 
 #### 功能说明
 - **数据查看**: 查看所有抓取的DDL数据
@@ -162,40 +156,6 @@ Web界面将在 `http://localhost:5000` 启动。
 - **摘要查看**: 查看AI生成的DDL摘要
 - **实时刷新**: 手动刷新数据和摘要
 
-## 服务管理
-
-### 查看运行状态
-```bash
-# 查看主程序状态
-sudo systemctl status qqbot.service
-
-# 查看SDU_DeepSeek状态
-sudo systemctl status sduapi.service
-```
-
-### 查看实时日志
-```bash
-# 查看主程序日志
-sudo journalctl -u qqbot.service -f
-
-# 查看SDU_DeepSeek日志
-sudo journalctl -u sduapi.service -f
-```
-
-### 常用管理命令
-```bash
-# 停止服务
-sudo systemctl stop qqbot.service
-sudo systemctl stop sduapi.service
-
-# 重启服务
-sudo systemctl restart qqbot.service
-sudo systemctl restart sduapi.service
-
-# 禁用开机自启
-sudo systemctl disable qqbot.service
-sudo systemctl disable sduapi.service
-```
 
 ## 使用说明
 

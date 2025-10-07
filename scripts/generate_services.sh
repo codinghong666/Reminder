@@ -6,6 +6,9 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 REPO_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
 
+# Ensure output directory exists early
+mkdir -p "$REPO_DIR/src/main/output"
+
 # Detect runtime context
 RUN_USER="${SUDO_USER:-$(whoami)}"
 RUN_GROUP="$(id -gn "$RUN_USER")"
