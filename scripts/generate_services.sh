@@ -1,0 +1,132 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+# Detect repo dir based on this script location
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+REPO_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
+
+# Detect runtime context
+RUN_USER="${SUDO_USER:-$(whoami)}"
+RUN_GROUP="$(id -gn "$RUN_USER")"
+PYTHON_BIN="${PYTHON_BIN:-$(command -v python3)}"
+
+# Service names
+QQBOT_SERVICE="qqbot.service"
+SDUAPI_SERVICE="sduapi.service"
+
+# Output paths
+SYSTEMD_DIR="/etc/systemd/system"
+OUT_QQBOT="$SYSTEMD_DIR/$QQBOT_SERVICE"
+OUT_SDUAPI="$SYSTEMD_DIR/$SDUAPI_SERVICE"
+
+echo "Using repo: $REPO_DIR"
+echo "Using python: $PYTHON_BIN"
+echo "Target services: $OUT_QQBOT, $OUT_SDUAPI"
+
+require_root() {
+  if [[ "${EUID:-$(id -u)}" -ne 0 ]]; then
+    echo "This script needs root to write systemd unit files. Re-run with sudo." >&2
+    exit 1;
+  fi
+}
+
+write_units() {
+  # qqbot.service
+  cat > "$OUT_QQBOT" <<EOF
+[Unit]
+Description=QQ Bot Scheduler Service
+After=network.target
+Wants=network.target
+
+[Service]
+Type=simple
+User=$RUN_USER
+Group=$RUN_GROUP
+WorkingDirectory=$REPO_DIR/src/main
+ExecStart=$PYTHON_BIN $REPO_DIR/src/main/main.py
+Restart=always
+RestartSec=10
+StandardOutput=journal
+StandardError=journal
+
+# Environment
+Environment=PYTHONUNBUFFERED=1
+Environment=PYTHONPATH=$REPO_DIR/src/main:$REPO_DIR
+
+# Security
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ReadWritePaths=$REPO_DIR
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+  # sduapi.service
+  cat > "$OUT_SDUAPI" <<EOF
+[Unit]
+Description=SDU DeepSeek API Service
+After=network.target
+Wants=network.target
+
+[Service]
+Type=simple
+User=$RUN_USER
+Group=$RUN_GROUP
+WorkingDirectory=$REPO_DIR/src/SDU_DeepSeek
+ExecStart=$PYTHON_BIN $REPO_DIR/src/SDU_DeepSeek/main.py
+Restart=always
+RestartSec=10
+StandardOutput=journal
+StandardError=journal
+
+# Environment
+Environment=PYTHONUNBUFFERED=1
+Environment=PYTHONPATH=$REPO_DIR/src/SDU_DeepSeek:$REPO_DIR
+
+# Security
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ReadWritePaths=$REPO_DIR
+
+[Install]
+WantedBy=multi-user.target
+EOF
+}
+
+reload_systemd() {
+  systemctl daemon-reload
+}
+
+maybe_enable_start() {
+  local unit="$1"
+  if [[ "${ENABLE_START:-1}" == "1" ]]; then
+    systemctl enable "$unit"
+    systemctl restart "$unit"
+  fi
+}
+
+main() {
+  require_root
+  write_units
+  reload_systemd
+  echo "Generated: $OUT_QQBOT"
+  echo "Generated: $OUT_SDUAPI"
+  if [[ "${AUTO_START:-0}" == "1" ]]; then
+    maybe_enable_start "$QQBOT_SERVICE"
+    maybe_enable_start "$SDUAPI_SERVICE"
+    echo "Services enabled and restarted."
+  else
+    echo "You can now enable/start services:"
+    echo "  sudo systemctl enable $QQBOT_SERVICE && sudo systemctl restart $QQBOT_SERVICE"
+    echo "  sudo systemctl enable $SDUAPI_SERVICE && sudo systemctl restart $SDUAPI_SERVICE"
+    echo "(Or run with AUTO_START=1 to do this automatically)"
+  fi
+}
+
+main "$@"
+
+

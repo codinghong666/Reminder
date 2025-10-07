@@ -35,6 +35,8 @@ QQBot/Reminder/
 │   │   ├── sduwrap.py          # API封装
 │   │   └── cookies.json        # 登录状态（自动生成）
 │   └── requirements.txt        # Python依赖
+├── scripts/                     # 实用脚本
+│   └── generate_services.sh     # 自动生成并安装 systemd 单元
 ```
 
 ## 工作原理
@@ -76,17 +78,17 @@ python main.py
 
 首次运行会要求输入学号和密码，登录成功后会自动保存登录状态。
 
-#### 配置systemd服务（可选）
+#### 配置systemd服务（可选，推荐用脚本自动生成路径）
 ```bash
-# 复制服务文件
-sudo cp src/SDU_DeepSeek/sduapi.service /etc/systemd/system/
+# 授权脚本（首次）
+chmod +x scripts/generate_services.sh
 
-# 重新加载配置
-sudo systemctl daemon-reload
+# 自动生成并安装 systemd 服务（根据当前仓库路径、用户和 Python 自动写入）
+sudo scripts/generate_services.sh
 
-# 启用并启动服务
-sudo systemctl enable sduapi.service
-sudo systemctl start sduapi.service
+# 可选：指定 Python 解释器与自动启动
+# 使用你自己的 Python 路径（如 /home/you/miniconda3/envs/qqbot/bin/python）
+PYTHON_BIN=/usr/bin/python3 AUTO_START=1 sudo -E scripts/generate_services.sh
 ```
 
 ### 4. 主程序配置
@@ -95,40 +97,53 @@ sudo systemctl start sduapi.service
 
 ```env
 # 模型配置
-MODEL=Qwen/Qwen3-8B                    # 本地模型名称
-BASE_URL=http://localhost:3001         # LLM API地址（本地或SDU_DeepSeek）
+MODEL=Qwen/Qwen3-8B                    # 本地/远程模型名称
+BASE_URL=http://localhost:3000        # LLM/API 基础地址（本地或SDU_DeepSeek）
+
+# 模式选择
+MODEL_CHOICE=api_model                 # 可选：local_model | sdu_model | api_model
 
 # NapCat配置
-TOKEN=your_napcat_token                # NapCat认证token
-GROUP_IDS=534116547,914404708         # 监控的QQ群号，用逗号分隔
-WORKING_QQ=2372124330                  # 工作QQ号
+TOKEN=napcat_token_888888              # NapCat认证token（示例）
+GROUP_IDS=888888888,666666666          # 监控的QQ群号（示例，用逗号分隔）
+WORKING_QQ=1008611                     # 工作QQ号（示例）
 
 # 消息配置
 MESSAGE_COUNT=5                        # 每次抓取的消息数量
-SUMMARY_COUNT=10                       # 摘要生成的消息数量
-SEND_ID=1767819342                     # 接收提醒的QQ号
+SUMMARY_COUNT=5                        # 摘要生成的消息数量
+SEND_ID=10086                          # 接收提醒的QQ号（示例）
 
 # 时间配置
-WORK_TIME=19:35                        # 信息提取时间
-SEND_TIME=19:40                        # 提醒发送时间
+WORK_TIME=19:35                        # 信息提取时间（24小时制）
+SEND_TIME=19:40                        # 提醒发送时间（24小时制）
+
+# API密钥
+API_KEY=sk-****-8888-6666-168-1314     # LLM/API密钥（示例占位）
 ```
 
-### 5. 服务部署
+### 5. 服务部署（自动）
 
-#### 部署主程序服务
+#### 使用脚本一键生成并安装 systemd 服务
 ```bash
-# 复制服务文件
-sudo cp src/main/qqbot.service /etc/systemd/system/
+# 授权脚本（首次）
+chmod +x scripts/generate_services.sh
 
-# 修改服务文件中的路径（如需要）
-sudo nano /etc/systemd/system/qqbot.service
+# 默认使用当前用户与系统 python3
+sudo scripts/generate_services.sh
 
-# 重新加载配置
+# 可选：自定义 Python 解释器并自动启动服务
+PYTHON_BIN=/usr/bin/python3 AUTO_START=1 sudo -E scripts/generate_services.sh
+```
+
+脚本会根据当前仓库路径自动生成并写入：
+- `qqbot.service`（工作目录：`src/main`，启动 `main.py`）
+- `sduapi.service`（工作目录：`src/SDU_DeepSeek`，启动 `main.py`）
+
+生成后如需手动操作：
+```bash
 sudo systemctl daemon-reload
-
-# 启用并启动服务
-sudo systemctl enable qqbot.service
-sudo systemctl start qqbot.service
+sudo systemctl enable qqbot.service && sudo systemctl restart qqbot.service
+sudo systemctl enable sduapi.service && sudo systemctl restart sduapi.service
 ```
 
 ### 6. Flask Web界面
