@@ -17,14 +17,32 @@ detect_user_python() {
     echo "$PYTHON_BIN"; return 0;
   fi
 
-  # 2) Try user's active python (captures conda env if activated in their shell)
+  # 2) Prefer current terminal's active python (captures conda/mamba already activated in this shell)
+  local p
+  p=$(python -c 'import sys;print(sys.executable)' 2>/dev/null || true)
+  if [[ -n "$p" ]] && [[ -x "$p" ]]; then
+    echo "$p"; return 0;
+  fi
+
+  # 3) Try current terminal PATH python
+  p=$(command -v python 2>/dev/null || true)
+  if [[ -n "$p" ]] && [[ -x "$p" ]]; then
+    echo "$p"; return 0;
+  fi
+
+  p=$(command -v python3 2>/dev/null || true)
+  if [[ -n "$p" ]] && [[ -x "$p" ]]; then
+    echo "$p"; return 0;
+  fi
+
+  # 4) Try original user's login shell python (in case script is run with sudo without -E)
   local p
   p=$(sudo -u "$RUN_USER" -H bash -lc 'python -c "import sys;print(sys.executable)"' 2>/dev/null || true)
   if [[ -n "$p" ]] && [[ -x "$p" ]]; then
     echo "$p"; return 0;
   fi
 
-  # 3) Try user's PATH python
+  # 5) Try original user's PATH python
   p=$(sudo -u "$RUN_USER" -H bash -lc 'command -v python' 2>/dev/null || true)
   if [[ -n "$p" ]] && [[ -x "$p" ]]; then
     echo "$p"; return 0;
@@ -35,7 +53,7 @@ detect_user_python() {
     echo "$p"; return 0;
   fi
 
-  # 4) Fallback to system
+  # 6) Fallback to system
   if command -v python3 >/dev/null 2>&1; then
     command -v python3; return 0;
   fi
