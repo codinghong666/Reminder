@@ -10,6 +10,33 @@ REPO_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
 RUN_USER="${SUDO_USER:-$(whoami)}"
 RUN_GROUP="$(id -gn "$RUN_USER")"
 
+# Capture current terminal's python before escalating to root
+detect_shell_python_pre_sudo() {
+  # 1) Honor explicit override
+  if [[ -n "${PYTHON_BIN:-}" ]] && [[ -x "${PYTHON_BIN}" ]]; then
+    echo "$PYTHON_BIN"; return 0;
+  fi
+
+  # 2) Current shell executable (best for activated conda)
+  local p
+  p=$(python -c 'import sys;print(sys.executable)' 2>/dev/null || true)
+  if [[ -n "$p" ]] && [[ -x "$p" ]]; then
+    echo "$p"; return 0;
+  fi
+
+  # 3) PATH fallbacks in current shell
+  p=$(command -v python 2>/dev/null || true)
+  if [[ -n "$p" ]] && [[ -x "$p" ]]; then
+    echo "$p"; return 0;
+  fi
+  p=$(command -v python3 2>/dev/null || true)
+  if [[ -n "$p" ]] && [[ -x "$p" ]]; then
+    echo "$p"; return 0;
+  fi
+
+  echo ""; return 1;
+}
+
 # Prefer the caller's conda/mamba/micromamba env python if available
 detect_user_python() {
   # 1) Honor explicit override
@@ -63,6 +90,17 @@ detect_user_python() {
 
   echo ""; return 1;
 }
+
+if [[ "${EUID:-$(id -u)}" -ne 0 ]]; then
+  # Not root: resolve python in THIS terminal first, then re-exec with sudo preserving it
+  PYTHON_FROM_SHELL="$(detect_shell_python_pre_sudo || true)"
+  if [[ -z "${PYTHON_FROM_SHELL}" ]]; then
+    echo "Failed to detect Python from current shell. Try activating your env or set PYTHON_BIN." >&2
+    exit 1
+  fi
+  echo "Re-executing with sudo using current shell python: ${PYTHON_FROM_SHELL}"
+  exec sudo -E PYTHON_BIN="${PYTHON_FROM_SHELL}" bash "$0" "$@"
+fi
 
 PYTHON_BIN="$(detect_user_python)"
 if [[ -z "$PYTHON_BIN" ]]; then
